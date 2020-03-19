@@ -63,7 +63,7 @@ class Blob:
     def features3(self):
         return [self._size, self._compactness, self._centroid[0], self._centroid[1], ] 
 
-def extract_features(file_path, W, H, K, h = 0.8, min_blob_size = 20, label=None):
+def extract_features(file_path, W, H, K, h = 0.8, min_blob_size = 20, class_label=None):
     vc = cv2.VideoCapture(file_path)
     ret, first_frame = vc.read()
     # TODO: check ret
@@ -77,14 +77,14 @@ def extract_features(file_path, W, H, K, h = 0.8, min_blob_size = 20, label=None
 
     video_blobs = []
     # process file
-    caption = 'fight' if label == 1 else 'no-fight'
-    color = (10, 69, 250) if label == 1 else (0, 255, 0)
+    caption = 'fight' if class_label == 1 else 'no-fight'
+    color = (10, 69, 250) if class_label == 1 else (0, 255, 0)
     while(vc.isOpened()):
         try:
             # Read a frame from video
             ret, frame = vc.read()
             frame = cv2.resize(frame, (W, H), interpolation = cv2.INTER_AREA)
-            if label:
+            if class_label:
                 font = cv2.FONT_HERSHEY_SIMPLEX
                 cv2.putText(frame, caption, (int(W/2)-60,int(H/2)), font, 1, color, 2, cv2.LINE_AA)
                 cv2.imshow('action', frame)

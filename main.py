@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from features.extractor import extract_features
-from dataset.dataset import surv_experiment, surv_ext_experiment, office_test, hockey_test, movies_test
+from dataset.dataset import surv_experiment, surv_ext_experiment, surv_ext_experiment_complete, office_test, hockey_test, movies_test
 import tqdm
 import lightgbm as lgb
 from sklearn.model_selection import GridSearchCV
@@ -23,7 +23,7 @@ def process_files(process_name, files, labels=[]):
         tqdm_files = tqdm.tqdm(total=files.shape[0], desc=process_name, position=0)
         for i, f in enumerate(files):
             if len(labels) == len(files):
-                features = extract_features(f, W, H, K, label=labels[i])
+                features = extract_features(f, W, H, K, class_label=labels[i])
             else:
                 features = extract_features(f, W, H, K)
             if len(features) > 0:
@@ -50,10 +50,12 @@ def lgb_f1_score(y_true, y_pred):
 def main():
     # X_train, X_valid, y_train, y_valid = surv_experiment()
 
-    X_train, X_valid, y_train, y_valid = surv_ext_experiment()
+    # X_train, X_valid, y_train, y_valid = surv_ext_experiment()
+    
+    X_train, X_valid, X_test, y_train, y_valid, y_test = surv_ext_experiment_complete()
 
     print('Processing train videos ...')
-    train_df,_ = process_files('Train Features', X_train, y_train)
+    train_df,_ = process_files('Train Features', X_train)#, y_train)
 
     print('Processing validation videos ...')
     valid_df, skip_ix = process_files('Validation Features', X_valid)
@@ -127,7 +129,10 @@ def main():
     print('Model Test')
     print('-'*40)
 
-    X_test, y_test = office_test(sample=True, ratio=2)
+    
+    # dataset which is not in train set
+    # X_test, y_test = office_test(sample=True, ratio=2)
+    
     # X_test, y_test = hockey_test()
     # X_test, y_test = movies_test()
 
